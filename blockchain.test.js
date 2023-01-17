@@ -75,8 +75,8 @@ describe('Blockchain', () => {
                     blockchain.chain.push(badBlock);
 
                     expect( Blockchain.isValidChain( blockchain.chain ) ).toBe(false);
-                })
-            })
+                });
+            });
 
             //describe('and the chain does not contains a block with an invalid field', () => {
             describe('and the chain does not contains a block with any invalid block', () => {

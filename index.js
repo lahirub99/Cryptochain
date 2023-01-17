@@ -1,8 +1,11 @@
+const bodyParser = require('body-parser');
 const express = require('express');
 const Blockchain = require('./blockchain');
 
 const app = express();
 const blockchain = new Blockchain();
+
+app.use(bodyParser.json());
 
 app.get('/api/blocks', (req, res) => {  
     // 1st param - End point to hit to read data - > '/api/blocks', where the GET requtest is located
@@ -11,6 +14,16 @@ app.get('/api/blocks', (req, res) => {
     // res - respond
     res.json(blockchain.chain);     // Sends the chain in JSON form
 });
+
+app.post('api/mine', (req, res) => {
+    const { data } = req.body;
+
+    // Adds a block to the blockjain with recieved data
+    blockchain.addBlock({data});
+
+    //Gives confirmation to the requester -> Can see new data block is added to the chain
+    res.redirect('api/blocks');
+})
 
 const PORT = 3000;
 app.listen(PORT, () => {
