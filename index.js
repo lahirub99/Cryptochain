@@ -15,14 +15,14 @@ app.get('/api/blocks', (req, res) => {
     res.json(blockchain.chain);     // Sends the chain in JSON form
 });
 
-app.post('api/mine', (req, res) => {
+app.post('/api/mine', (req, res) => {
     const { data } = req.body;
 
     // Adds a block to the blockjain with recieved data
     blockchain.addBlock({data});
 
     //Gives confirmation to the requester -> Can see new data block is added to the chain
-    res.redirect('api/blocks');
+    res.redirect('/api/blocks');
 })
 
 const PORT = 3000;
