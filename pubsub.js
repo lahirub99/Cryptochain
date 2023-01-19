@@ -4,22 +4,27 @@
 const redis = require('redis');
 
 const CHANNELS = {
-    TEST: 'TEST'
+    TEST: 'TEST',
+    BLOCKCHAIN: 'BLOCKCHAIN'
 };
 
 class PubSub {
-    constructor() {
-        this.publisher = redis.createClient();
-        this.subscriber =  redis.createClient();
+    constructor( blockchain ) {
+        this.blockchain = blockchain;
+        this.publisher = redis.createClient({ legacyMode: true});
+        this.subscriber = redis.createClient({ legacyMode: true});
 
         this.subscriber.on('error', (err) => console.log('Redis Client Error', err));
         this.subscriber.connect();
         this.publisher.on('error', (err) => console.log('Redis Client Error', err));
         this.publisher.connect();
 
-        this.subscriber.subscribe(CHANNELS.TEST, (message) => {
-            this.handleMessage(CHANNELS.TEST, message); // 'message'
-        });
+        this.subscribeToChannels();
+
+        // this.subscriber.subscribe(CHANNELS.TEST, (message) => {
+        //     this.handleMessage(CHANNELS.TEST, message); // 'message'
+        // });
+
         /*
         // this.subscriber.on(
         //     'message',
@@ -29,14 +34,45 @@ class PubSub {
 
     handleMessage(channel, message) {
         console.log(`Message received. Channel: ${channel}. Message: ${message}`);
+
+        const parsedMessage = JSON.parse(message);
+        if (channel === CHANNELS.BLOCKCHAIN) {
+            this.blockchain.replaceChain(parsedMessage);
+        }
+    }
+
+    subscribeToChannels() {
+        Object.values( CHANNELS ).forEach(
+            channel => {
+                this.subscriber.subscribe(channel, (message) => {
+                    this.handleMessage(channel, message);
+                });
+                //this.subscriber.subscribe(channel);
+            }
+        );
+    }
+
+    publish({channel, message}) {   // Publishes a given message in a specific Channel
+        this.publisher.publish(channel, message);
+    }
+
+    broadcastChain() {
+        /* Behaviours:
+            1. Boadcast the Blockchain
+            2. Update the Blockchain if there's newer version
+        */ 
+       this.publish({
+        channel: CHANNELS.BLOCKCHAIN,
+        message: JSON.stringify( this.blockchain.chain )
+       });
     }
 }
 
-// /* Test for Messege sending
+/* Test for Messege sending
 const testPubSub = new PubSub();
 setTimeout(() => testPubSub.publisher.publish(CHANNELS.TEST, 'foo'), 2000);
 //testPubSub.publisher.publish(CHANNELS.TEST, 'foo');
-//*/
+*/
 
 module.exports = PubSub;
 //*/
