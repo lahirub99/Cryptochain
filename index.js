@@ -7,7 +7,15 @@ const app = express();
 const blockchain = new Blockchain();
 const pubsub = new PubSub({ blockchain });
 
-setTimeout( () => pubsub.broadcastChain(), 1000);
+// setTimeout(() => pubsub.publisher.publish('BLOCKCHAIN', JSON.stringify( blockchain.chain ), 2000));
+
+//const parsedMessage = JSON.parse(JSON.stringify(blockchain.chain));
+//blockchain.replaceChain(parsedMessage);
+        
+setTimeout( () => pubsub.broadcastChain(), 1000, (err, reply) => {
+    if (err) throw err;
+    console.log(reply);
+  });
 
 app.use(bodyParser.json());
 

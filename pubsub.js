@@ -2,6 +2,7 @@
  //My code - Redis
 
 const redis = require('redis');
+const blockchain = require('./blockchain');
 
 const CHANNELS = {
     TEST: 'TEST',
@@ -11,8 +12,8 @@ const CHANNELS = {
 class PubSub {
     constructor( blockchain ) {
         this.blockchain = blockchain;
-        this.publisher = redis.createClient({ legacyMode: true});
-        this.subscriber = redis.createClient({ legacyMode: true});
+        this.publisher = redis.createClient();
+        this.subscriber = redis.createClient();
 
         this.subscriber.on('error', (err) => console.log('Redis Client Error', err));
         this.subscriber.connect();
@@ -64,6 +65,9 @@ class PubSub {
        this.publish({
         channel: CHANNELS.BLOCKCHAIN,
         message: JSON.stringify( this.blockchain.chain )
+       }, (err, reply) => {
+        if (err) throw err;
+        console.log(reply);
        });
     }
 }
