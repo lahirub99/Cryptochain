@@ -25,11 +25,24 @@ app.post('/api/mine', (req, res) => {
     // Adds a block to the blockjain with recieved data
     blockchain.addBlock({data});
 
+    //Update the blockchain and broadcast the updated version to other nodes
+    pubsub.broadcastChain();
+
     //Gives confirmation to the requester -> Can see new data block is added to the chain
     res.redirect('/api/blocks');
 })
 
-const PORT = 33003;
+const DEFAULT_PORT = 3000;
+let PEER_PORT;     // Not defined
+
+if (process.env.GENERATE_PEER_PORT === 'true') {
+    PEER_PORT = DEFAULT_PORT + Math.ceil( Math.random() * 1000 ); 
+    // Giving a int value ranging from 3001 to 4000 to the PEER_PORT (DEFALT_PORT = 3000)
+}
+
+const PORT = PEER_PORT || DEFAULT_PORT;     // look for PEER_PORT, assign DEFAULT value if it is unavailable
+
+
 app.listen(PORT, () => {
     console.log(`listening at localhost:${PORT}`);
 })

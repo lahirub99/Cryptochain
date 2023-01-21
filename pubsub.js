@@ -1,5 +1,62 @@
+const redis = require('redis');
 
- //My code - Redis
+const CHANNELS = {
+  TEST: 'TEST',
+  BLOCKCHAIN: 'BLOCKCHAIN'
+};
+
+class PubSub {
+  constructor({ blockchain }) {
+    this.blockchain = blockchain;
+   
+    this.publisher = redis.createClient();
+    this.subscriber = redis.createClient();
+
+    //this.publisher.on("error", (error) => console.error(`Error : ${error}`));
+    //this.subscriber.on("error", (error) => console.error(`Error : ${error}`));
+    
+      //await this.publisher.connect();
+    
+    this.subscribeToChannels();
+
+    this.subscriber.on(
+      'message',
+      (channel, message) => this.handleMessage(channel, message)
+    );
+  }
+
+  handleMessage(channel, message) {
+    console.log(`Message received. Channel: ${channel}. Message: ${message}`);
+
+    const parsedMessage = JSON.parse(message);
+
+    if (channel === CHANNELS.BLOCKCHAIN) {
+      this.blockchain.replaceChain(parsedMessage);
+    }
+  }
+
+  subscribeToChannels() {
+    Object.values(CHANNELS).forEach(channel => {
+      this.subscriber.subscribe(channel);
+    });
+  }
+
+  publish({ channel, message}) {
+    this.publisher.publish(channel, message);
+  }
+
+  broadcastChain() {
+    this.publish({
+      channel: CHANNELS.BLOCKCHAIN,
+      message: JSON.stringify(this.blockchain.chain)
+    });
+  }
+}
+
+module.exports = PubSub;
+
+
+/* //My code - Redis
 
 const redis = require('redis');
 
@@ -29,7 +86,7 @@ class PubSub {
         // this.subscriber.on(
         //     'message',
         //     (message, channel) => this.handleMessage(channel, message));
-        // console.log('ASD'); */
+        // console.log('ASD'); //
     }
 
     handleMessage(channel, message) {
@@ -57,16 +114,17 @@ class PubSub {
     }
 
     broadcastChain() {
-        /* Behaviours:
-            1. Boadcast the Blockchain
-            2. Update the Blockchain if there's newer version
-        */ 
+        // Behaviours:
+        //    1. Boadcast the Blockchain
+        //    2. Update the Blockchain if there's newer version
+        // 
        this.publish({
         channel: CHANNELS.BLOCKCHAIN,
         message: JSON.stringify( this.blockchain.chain )
        });
     }
 }
+*/
 
 /* Test for Messege sending
 const testPubSub = new PubSub();
