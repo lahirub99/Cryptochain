@@ -13,12 +13,12 @@ describe('Transaction', () => {
     });
 
     it('has an `id`', () => {
-        expect(transaction).toHaveProperty(id);
+        expect(transaction).toHaveProperty('id');
     });
 
     describe('outputMap', () => {
         it('has an `outputMap`', () => {
-            expect(transaction).toHaveProperty(outputMap);
+            expect(transaction).toHaveProperty('outputMap');
         });
 
         it('output the amount to the reciepient', () => {
@@ -30,4 +30,6 @@ describe('Transaction', () => {
                 .toEqual( senderWallet.balance - amount );
         });
     });
+
+
 });
