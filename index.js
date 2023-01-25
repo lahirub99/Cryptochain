@@ -75,13 +75,23 @@ app.post('/api/transact', (req, res) => {
 
     res.json({ type: 'success', transaction });
 });
-const syncChains = () => {
+
+const syncWithRootState = () => {
     request({ url: `${ROOT_NODE_ADDRESS}/api/blocks` }, (error, response, body) => {
         if (!error && response.statusCode === 200) {
             const rootChain = JSON.parse(body);
 
             console.log('replace chain on a sync with', rootChain);
             blockchain.replaceChain(rootChain);
+        }
+    });
+
+    request({ url: `${ROOT_NODE_ADDRESS}/api/transaction-pool-map`}, (error, response, body) => {
+        if (!error && response.statusCode === 200) {                                                        // Error 02 - response.statusCode === 200, TypeError: response.statusCode is not a function; previously typed response.statusCode(200) xx
+            const rootTransactionPoolMap = JSON.parse(body);
+
+            console.log('replace the transaction pool map on a sync with', rootTransactionPoolMap);         // Error 01 - Spell rootTransactionPoolMap Correctly
+            transactionPool.setMap(rootTransactionPoolMap);
         }
     });
 };
@@ -104,6 +114,6 @@ app.listen(PORT, () => {
     console.log(`listening at localhost:${PORT}`);
 
     if (PORT !== DEFAULT_PORT) {    //z
-        syncChains();
+        syncWithRootState();
     }
 })
