@@ -7,6 +7,11 @@ class TransactionPool {
         this.transactionMap [transaction.id] = transaction;
     }
 
+    setMap(transactionPoolMap) {
+        this.transactionPoolMap = transactionPoolMap;
+        // I used tranactionPoolMap for clarification, but 'transactionMap' used in the given code.
+    }
+
     existingTransaction({ inputAddress }) {
         // Goal is to return the transaction that exist 
         // for this input address if there's one already
