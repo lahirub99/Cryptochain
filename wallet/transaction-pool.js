@@ -1,3 +1,5 @@
+const Transaction = require("./transaction");
+
 class TransactionPool {
     constructor() {
         this.transactionMap = {};
@@ -23,6 +25,12 @@ class TransactionPool {
             );
             // Go through the transactions and returns the 1st transaction 
             // where matching occurs in the input address.
+    }
+
+    validTransactions() {
+        return Object.values( this.transactionMap ).filter(
+            transaction => Transaction.validTransaction(transaction)
+        );
     }
 }
 
